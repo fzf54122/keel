@@ -39,6 +39,7 @@ Business code speaks these names:
 ```python
 from common.core.response import KeelResponse
 from common.core.service import KeelService
+from common.core.viewsets import KeelViewSet
 from application.db.base import KeelModel
 
 return KeelResponse(data=user, msg="ok")
@@ -81,7 +82,7 @@ Open Docs, hit `POST /api/auth/login/`, then play with `/api/items/`.
 | Data | SQLAlchemy async, Alembic layout, table prefix `keel_` |
 | Access | User / Role / Menu / Api / Dept + JWT |
 | Demo | `/api/items/` minimal CRUD |
-| Conventions | `KeelResponse` · `KeelService` · `KeelSchemas` · `KeelModel` |
+| Conventions | `KeelResponse` · `KeelService` · `KeelViewSet` · `KeelModel` |
 
 Common endpoints:
 
@@ -118,6 +119,7 @@ Keep the conventions boring on purpose:
 - Response: `return KeelResponse(data=..., msg="...")`
 - Model: inherit `KeelModel`
 - Service: inherit `KeelService`
+- API: inherit `KeelViewSet` (uuid / pagination / auth / SQLAlchemy included)
 - Auth: `DependAuth` / `DependPermisson` (local: `DISABLE_AUTH=true`)
 
 ---

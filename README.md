@@ -39,6 +39,7 @@ conf/                   配置（不写业务）
 ```python
 from common.core.response import KeelResponse
 from common.core.service import KeelService
+from common.core.viewsets import KeelViewSet
 from application.db.base import KeelModel
 
 return KeelResponse(data=user, msg="ok")
@@ -81,7 +82,7 @@ make docker-up   # postgres + redis
 | 数据 | SQLAlchemy async、Alembic 目录、表前缀 `keel_` |
 | 权限 | User / Role / Menu / Api / Dept + JWT |
 | 示例 | `/api/items/` 最小 CRUD |
-| 规范 | `KeelResponse` · `KeelService` · `KeelSchemas` · `KeelModel` |
+| 规范 | `KeelResponse` · `KeelService` · `KeelViewSet` · `KeelModel` |
 
 常用接口：
 
@@ -118,6 +119,7 @@ application/modules/<name>/
 - 响应：`return KeelResponse(data=..., msg="...")`
 - 模型：继承 `KeelModel`
 - 服务：继承 `KeelService`
+- 接口：继承 `KeelViewSet`（uuid / 分页 / 鉴权 / SQLAlchemy 已内置）
 - 鉴权：`DependAuth` / `DependPermisson`（本地可 `DISABLE_AUTH=true`）
 
 ---

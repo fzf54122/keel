@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from fastapi import APIRouter
-from fast_generic_api.generics import CustomViewSet, GenericAPIView
 
 from application.modules.rbac.models import MenuModel
 from application.modules.rbac.serializers import (
@@ -10,24 +9,16 @@ from application.modules.rbac.serializers import (
     MenuSerializers,
     MenuUpdateSerializers,
 )
-from application.db.backend import backend_provider
-from application.pagination import LimitOffsetMaxDefaultPagination
-from common.core.permission import DependPermisson
-from conf import settings
+from common.core.viewsets import KeelViewSet
 
 router = APIRouter(tags=["菜单管理"])
 
 
-class MenuViewSet(CustomViewSet, GenericAPIView):
+class MenuViewSet(KeelViewSet):
     router = router
     prefix = "/menus"
     queryset = MenuModel
     ordering = ["order", "id"]
-    loop_uuid_field = "uuid"
-    lookup_field = "uuid"
     serializer_class = MenuSerializers
     serializer_create_class = MenuCreateSerializers
     serializer_update_class = MenuUpdateSerializers
-    pagination_class = LimitOffsetMaxDefaultPagination
-    backend_provider = staticmethod(backend_provider)
-    permissions = [] if settings.DISABLE_AUTH else [DependPermisson]

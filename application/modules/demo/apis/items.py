@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from fastapi import APIRouter
-from fast_generic_api.generics import CustomViewSet, GenericAPIView
 
 from application.modules.demo.models import ItemModel
 from application.modules.demo.serializers import (
@@ -10,25 +9,16 @@ from application.modules.demo.serializers import (
     ItemSerializers,
     ItemUpdateSerializers,
 )
-from application.db.backend import backend_provider
-from application.pagination import LimitOffsetMaxDefaultPagination
-from common.core.permission import DependPermisson
-from conf import settings
+from common.core.viewsets import KeelViewSet
 
 router = APIRouter(tags=["Demo Items"])
 
 
-class ItemViewSet(CustomViewSet, GenericAPIView):
+class ItemViewSet(KeelViewSet):
     router = router
     prefix = "/items"
     queryset = ItemModel
-    ordering = ["-created_at"]
-    loop_uuid_field = "uuid"
-    lookup_field = "uuid"
     search_fields = ["name", "content"]
     serializer_class = ItemSerializers
     serializer_create_class = ItemCreateSerializers
     serializer_update_class = ItemUpdateSerializers
-    pagination_class = LimitOffsetMaxDefaultPagination
-    backend_provider = staticmethod(backend_provider)
-    permissions = [] if settings.DISABLE_AUTH else [DependPermisson]
