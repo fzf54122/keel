@@ -11,6 +11,17 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.11", "3.12"]
+        db: [sqlite]
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -23,6 +34,29 @@ jobs:
           pip install -e ".[dev,test]"
       - name: Import check
         run: python -c "from application import create_app; print('import ok')"
+      - name: Alembic upgrade (file sqlite)
+        env:
+          APP_ENV: testing
+          DEBUG: "true"
+          SECRET_KEY: test-secret-key-at-least-32-characters-long
+          SWAGGER_UI_PASSWORD: test_password
+          DATABASE_URL: sqlite+aiosqlite:///./ci.db
+          AUTO_CREATE_TABLES: "false"
+          DISABLE_AUTH: "true"
+        run: |
+          alembic upgrade head
+          python - <<'PY'
+          import asyncio
+          from sqlalchemy import text
+          from application.db.session import engine
+          async def main():
+              async with engine.connect() as conn:
+                  rows = await conn.execute(text("select name from sqlite_master where type='table'"))
+                  names = {r[0] for r in rows}
+                  assert "keel_user" in names
+                  print("alembic-ok", sorted(names)[:5])
+          asyncio.run(main())
+          PY
       - name: Run tests
         env:
           APP_ENV: testing
@@ -33,4 +67,6 @@ jobs:
           DISABLE_AUTH: "true"
           AUTO_CREATE_TABLES: "true"
           BOOTSTRAP_ADMIN_PASSWORD: AdminPass123
+          CELERY_TASK_ALWAYS_EAGER: "true"
+          REDIS_URL: redis://localhost:6379/0
         run: pytest tests/ -q

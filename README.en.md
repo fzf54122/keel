@@ -142,6 +142,7 @@ Full list: [`.env.example`](.env.example). The ones you actually touch:
 | `REDIS_URL` | cache / token blacklist (degrades if down) |
 | `AUTO_CREATE_TABLES` | local auto-create; production: `false` |
 | `BOOTSTRAP_ADMIN_*` | first-boot superuser |
+| `REDIS_REQUIRED` | fail hard if Redis is down (default: degrade) |
 
 Local shortcut:
 
@@ -171,6 +172,8 @@ pytest -q
 ```
 
 ---
+
+More: `docs/ERROR_CODES.md` · `docs/REDIS.md`
 
 ## vs Library
 

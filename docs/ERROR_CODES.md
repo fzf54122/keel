@@ -16,5 +16,6 @@
 | 403 | 无权限（HTTP） |
 | 422 | 请求参数校验失败 |
 | 500 | 未处理服务端错误 |
+| 503 | 缓存/依赖服务不可用（REDIS_REQUIRED） |
 
 业务模块请优先抛 `KeelException` 子类，而不是裸 `HTTPException`。

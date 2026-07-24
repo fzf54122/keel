@@ -56,12 +56,36 @@ def create_app() -> FastAPI:
 
     @app.get("/openapi.json", include_in_schema=False)
     async def get_open_api_endpoint():
-        return get_openapi(
+        schema = get_openapi(
             title=app.title,
             version=app.version,
             description=app.description,
             routes=app.routes,
         )
+        # 统一响应信封示例，方便前端对齐
+        schema.setdefault("components", {}).setdefault("schemas", {})["KeelEnvelope"] = {
+            "type": "object",
+            "properties": {
+                "code": {"type": "integer", "example": 200},
+                "status": {"type": "string", "example": "success"},
+                "data": {"nullable": True},
+                "msg": {"type": "string", "example": "OK"},
+            },
+            "required": ["code", "status", "data", "msg"],
+            "example": {
+                "code": 200,
+                "status": "success",
+                "data": {"id": 1, "name": "demo"},
+                "msg": "OK",
+            },
+        }
+        schema["info"]["x-keel-response-envelope"] = {
+            "code": 200,
+            "status": "success",
+            "data": {},
+            "msg": "OK",
+        }
+        return schema
 
     @app.get("/health", tags=["health"])
     async def health():

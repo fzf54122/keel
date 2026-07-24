@@ -142,6 +142,7 @@ application/modules/<name>/
 | `REDIS_URL` | 缓存 / token 黑名单（挂了会降级） |
 | `AUTO_CREATE_TABLES` | 开发自动建表；生产改 `false` |
 | `BOOTSTRAP_ADMIN_*` | 首启超管 |
+| `REDIS_REQUIRED` | Redis 挂了是否硬失败（默认降级） |
 
 本地可以偷懒：
 
@@ -171,6 +172,8 @@ pytest -q
 ```
 
 ---
+
+更多：`docs/ERROR_CODES.md` · `docs/REDIS.md`
 
 ## 库的分工
 

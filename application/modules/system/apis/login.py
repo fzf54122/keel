@@ -43,6 +43,7 @@ class LoginViewSet:
             f"refresh_token:{user.id}",
             refresh_token,
             ttl=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS * 24 * 3600,
+            critical=False,
         )
         return KeelResponse(
             data=JWTOut(
@@ -66,8 +67,10 @@ class LoginViewSet:
         token = credentials.credentials
         try:
             payload = verify_token(token, token_type="access")
-            await cache_manager.set(f"blacklist_token:{token}", "logged_out", ttl=86400)
-            await cache_manager.delete(f"refresh_token:{payload.user_id}")
+            await cache_manager.set(
+                f"blacklist_token:{token}", "logged_out", ttl=86400, critical=False
+            )
+            await cache_manager.delete(f"refresh_token:{payload.user_id}", critical=False)
         except Exception:
             pass
         return KeelResponse(msg="退出登录成功")
@@ -77,8 +80,13 @@ class LoginViewSet:
     @router.post("/auth/refresh/", summary="刷新Token")
     async def refresh_token(request: Request, body: RefreshTokenRequest):
         payload = verify_token(body.refresh_token, token_type="refresh")
-        stored = await cache_manager.get(f"refresh_token:{payload.user_id}")
-        if stored and stored != body.refresh_token:
+        stored = await cache_manager.get(f"refresh_token:{payload.user_id}", critical=False)
+        # Redis 可用时强制匹配；不可用且 REDIS_REQUIRED=false 时降级放行
+        if stored is None and settings.REDIS_REQUIRED:
+            from fastapi import HTTPException
+
+            raise HTTPException(status_code=503, detail="Cache service unavailable")
+        if stored is not None and stored != body.refresh_token:
             from fastapi import HTTPException
 
             raise HTTPException(status_code=401, detail="Invalid refresh token")
@@ -104,6 +112,7 @@ class LoginViewSet:
             f"refresh_token:{user.id}",
             refresh_token,
             ttl=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS * 24 * 3600,
+            critical=False,
         )
         return KeelResponse(
             data=TokenRefreshOut(
