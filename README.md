@@ -184,11 +184,9 @@ Keel **用**它，不 **叫**它的名字。
 | 🗄️ | [SQLAlchemy](https://www.sqlalchemy.org/) · [Alembic](https://alembic.sqlalchemy.org/) | ORM · 迁移 |
 | 🎯 | [Django REST framework](https://www.django-rest-framework.org/) | ViewSet 手感的源头 |
 
----
-
 <div align="center">
 
-### 🪵 龙骨立好了。剩下的，交给你的业务。
+### 龙骨立好了。剩下的，交给你的业务。
 
 有用的话，给 [Keel](https://github.com/fzf54122/keel) 和 [fast_generic_api](https://github.com/fzf54122/fast_generic_api) 各一颗 ⭐
 

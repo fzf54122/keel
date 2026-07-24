@@ -185,11 +185,9 @@ Keel **uses** it. Keel is **not** named after it.
 | 🗄️ | [SQLAlchemy](https://www.sqlalchemy.org/) · [Alembic](https://alembic.sqlalchemy.org/) | ORM · migrations |
 | 🎯 | [Django REST framework](https://www.django-rest-framework.org/) | the ViewSet feel |
 
----
-
 <div align="center">
 
-### 🪵 The keel is set. The rest is your product.
+### The keel is set. The rest is your product.
 
 If it helps, leave a ⭐ on [Keel](https://github.com/fzf54122/keel) and [fast_generic_api](https://github.com/fzf54122/fast_generic_api)
 
