@@ -102,6 +102,9 @@ make celery-beat     # 定时调度
 
 ## 业务扩展
 
+生成模块：`make module name=order`
+
+
 别在 `common/` 里塞业务。新能力按模块长：
 
 ```text

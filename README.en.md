@@ -102,6 +102,9 @@ Common endpoints:
 
 ## Extend
 
+Generate a module: `make module name=order`
+
+
 Do not stuff business logic into `common/`. Grow by module:
 
 ```text

@@ -6,7 +6,7 @@ from datetime import datetime
 from uuid import UUID
 
 from common.core.schemas import KeelSchemas
-from pydantic import EmailStr, Field, field_validator
+from pydantic import EmailStr, Field, field_validator, model_validator
 
 
 class UsersSerializers(KeelSchemas):
@@ -23,6 +23,19 @@ class UsersSerializers(KeelSchemas):
     updated_at: datetime | None = None
     last_login: datetime | None = None
     roles: list[int] | None = None
+
+    @field_validator("roles", mode="before")
+    @classmethod
+    def normalize_roles(cls, v):
+        if v is None:
+            return None
+        result = []
+        for item in v:
+            if isinstance(item, int):
+                result.append(item)
+            else:
+                result.append(getattr(item, "id"))
+        return result
 
 
 class UsersCreateSerializers(KeelSchemas):

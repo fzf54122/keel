@@ -71,6 +71,8 @@ class Settings(BaseSettings):
     DISABLE_AUTH: bool = False
     AUTO_CREATE_TABLES: bool = True  # convenient for sqlite/demo; prefer alembic in prod
     ENABLE_DEMO: bool = True
+    # Redis 不可用时：false=降级（黑名单失效），true=关键路径失败
+    REDIS_REQUIRED: bool = False
 
     # Celery
     CELERY_BROKER_URL: str = ""
@@ -90,6 +92,14 @@ class Settings(BaseSettings):
         super().__init__(**kwargs)
         if self.APP_ENV == "production":
             self._validate_production_config()
+        elif self.APP_ENV not in {"testing"}:
+            for msg in self.warn_insecure_defaults():
+                # late import to avoid logger cycles at import time in some tools
+                try:
+                    from common.logger import logger
+                    logger.warning(f"[keel] {msg}")
+                except Exception:
+                    print(f"[keel] WARNING: {msg}")
 
     @field_validator("SECRET_KEY")
     @classmethod
@@ -109,6 +119,19 @@ class Settings(BaseSettings):
         if len(v) < 8:
             raise ValueError("SWAGGER_UI_PASSWORD length must be >= 8")
         return v
+
+    def warn_insecure_defaults(self) -> list[str]:
+        """开发期不安全默认项提示。"""
+        warnings: list[str] = []
+        if self.BOOTSTRAP_ADMIN_PASSWORD in {"AdminPass123", "admin", "password"}:
+            warnings.append("BOOTSTRAP_ADMIN_PASSWORD is weak; change it before production")
+        if self.SWAGGER_UI_PASSWORD in {"change-me-swagger", "admin", "password"}:
+            warnings.append("SWAGGER_UI_PASSWORD is weak")
+        if self.DISABLE_AUTH and self.APP_ENV != "testing":
+            warnings.append("DISABLE_AUTH=true (auth bypass enabled)")
+        if self.AUTO_CREATE_TABLES and self.APP_ENV == "production":
+            warnings.append("AUTO_CREATE_TABLES should be false in production")
+        return warnings
 
     def _validate_production_config(self) -> None:
         if self.DEBUG:

@@ -45,3 +45,22 @@ async def test_login_and_items_crud(client):
 
     deleted = await client.delete(f"/api/items/{lookup}/", headers=headers)
     assert deleted.status_code in (200, 204)
+
+
+@pytest.mark.asyncio
+async def test_items_filter(client):
+    login = await client.post(
+        "/api/auth/login/",
+        json={"username": "admin", "password": "AdminPass123"},
+    )
+    token = (login.json().get("data") or {}).get("access_token")
+    headers = {"Authorization": f"Bearer {token}"} if token else {}
+    await client.post("/api/items/", json={"name": "alpha", "content": "a"}, headers=headers)
+    await client.post("/api/items/", json={"name": "beta", "content": "b"}, headers=headers)
+    resp = await client.get("/api/items/?name__icontains=alp", headers=headers)
+    assert resp.status_code == 200, resp.text
+    data = resp.json().get("data") or {}
+    results = data.get("results") or data
+    if isinstance(results, list):
+        names = [r.get("name") for r in results]
+        assert "alpha" in names
