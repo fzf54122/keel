@@ -175,20 +175,34 @@ Keel **用**它，不 **叫**它的名字。
 
 ---
 
-## 鸣谢
+## 🙏 鸣谢
 
 Keel 站在这些肩膀上：
 
-- [fast_generic_api](https://github.com/fzf54122/fast_generic_api) — CRUD 引擎
-- [FastAPI](https://fastapi.tiangolo.com/) · [SQLAlchemy](https://www.sqlalchemy.org/) · [Alembic](https://alembic.sqlalchemy.org/)
-- [Django REST framework](https://www.django-rest-framework.org/) — ViewSet 手感的源头
+| | 项目 | 角色 |
+| --- | --- | --- |
+| ⚙️ | [fast_generic_api](https://github.com/fzf54122/fast_generic_api) | CRUD 引擎 |
+| ⚡ | [FastAPI](https://fastapi.tiangolo.com/) | 异步 Web 骨架 |
+| 🗄️ | [SQLAlchemy](https://www.sqlalchemy.org/) / [Alembic](https://alembic.sqlalchemy.org/) | ORM · 迁移 |
+| 🎯 | [Django REST framework](https://www.django-rest-framework.org/) | ViewSet 手感的源头 |
 
-如果 Keel 帮你少走弯路，给这个仓库一颗 Star；也请给 `fast_generic_api` 一颗。
+如果 Keel 帮你少走弯路：
+
+⭐ 给这个仓库一颗 Star  
+⭐ 也请给 [`fast_generic_api`](https://github.com/fzf54122/fast_generic_api) 一颗
 
 ---
 
-龙骨立好了。剩下的，交给你的业务。
+<div align="center">
 
-## License
+### 🪵 龙骨立好了。剩下的，交给你的业务。
 
-[Apache-2.0](LICENSE)
+**[⭐ Star](https://github.com/fzf54122/keel)** ·
+**[🐛 Issues](https://github.com/fzf54122/keel/issues)** ·
+**[🔀 Fork](https://github.com/fzf54122/keel/fork)**
+
+<br/>
+
+📄 License · [Apache-2.0](LICENSE)
+
+</div>

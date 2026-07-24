@@ -176,20 +176,34 @@ Keel **uses** it. Keel is **not** named after it.
 
 ---
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
-Keel stands on:
+Keel stands on these shoulders:
 
-- [fast_generic_api](https://github.com/fzf54122/fast_generic_api) — CRUD engine
-- [FastAPI](https://fastapi.tiangolo.com/) · [SQLAlchemy](https://www.sqlalchemy.org/) · [Alembic](https://alembic.sqlalchemy.org/)
-- [Django REST framework](https://www.django-rest-framework.org/) — the ViewSet feel
+| | Project | Role |
+| --- | --- | --- |
+| ⚙️ | [fast_generic_api](https://github.com/fzf54122/fast_generic_api) | CRUD engine |
+| ⚡ | [FastAPI](https://fastapi.tiangolo.com/) | async web core |
+| 🗄️ | [SQLAlchemy](https://www.sqlalchemy.org/) / [Alembic](https://alembic.sqlalchemy.org/) | ORM · migrations |
+| 🎯 | [Django REST framework](https://www.django-rest-framework.org/) | the ViewSet feel |
 
-If Keel saves you a detour, star this repo — and star `fast_generic_api` too.
+If Keel saves you a detour:
+
+⭐ Star this repo  
+⭐ And star [`fast_generic_api`](https://github.com/fzf54122/fast_generic_api) too
 
 ---
 
-The keel is set. The rest is your product.
+<div align="center">
 
-## License
+### 🪵 The keel is set. The rest is your product.
 
-[Apache-2.0](LICENSE)
+**[⭐ Star](https://github.com/fzf54122/keel)** ·
+**[🐛 Issues](https://github.com/fzf54122/keel/issues)** ·
+**[🔀 Fork](https://github.com/fzf54122/keel/fork)**
+
+<br/>
+
+📄 License · [Apache-2.0](LICENSE)
+
+</div>
