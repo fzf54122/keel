@@ -56,10 +56,11 @@ pip install -e ".[dev]"   # 或: uv sync --group dev
 make run-reload
 ```
 
-- Docs: http://127.0.0.1:8000/docs  
-- Health: http://127.0.0.1:8000/health  
-
-默认超管：`admin` / `AdminPass123`（立刻改掉）
+| | |
+| --- | --- |
+| Docs | http://127.0.0.1:8000/docs |
+| Health | http://127.0.0.1:8000/health |
+| 默认超管 | `admin` / `AdminPass123`（立刻改掉） |
 
 可选依赖：
 
@@ -67,9 +68,12 @@ make run-reload
 make docker-up   # postgres + redis
 ```
 
+第一次启动会自动：建表（开发模式）→ 种菜单/角色/超管 → 同步 API 权限表。  
+打开 Docs，先打 `POST /api/auth/login/`，再玩 `/api/items/`。
+
 ---
 
-## 你拿到什么
+## 骨架上已经钉好的东西
 
 | 层 | 内容 |
 | --- | --- |
@@ -89,34 +93,72 @@ make docker-up   # postgres + redis
 | API 同步 | `POST /api/apis/refresh/` |
 | Demo | `/api/items/` |
 
-新业务往这里长：
+---
+
+## 业务怎么往上长
+
+别在 `common/` 里塞业务。新能力按模块长：
 
 ```text
-application/modules/<name>/{apis,models,serializers,services}
+application/modules/<name>/
+├── apis/            # ViewSet / 路由
+├── models/          # SQLAlchemy 模型
+├── serializers/     # 入参 / 出参
+└── services/        # 业务动作
 ```
 
-然后挂到 `application/apis.py`，模型登记进 `application/models/__init__.py`。
+三步挂上去：
+
+1. 在模块里写好 `apis` / `models` / `serializers` / `services`
+2. 路由汇总进 [`application/apis.py`](application/apis.py)
+3. 模型登记进 [`application/models/__init__.py`](application/models/__init__.py)（给 Alembic / `create_all` 看见）
+
+约定尽量简单：
+
+- 响应：`return KeelResponse(data=..., msg="...")`
+- 模型：继承 `KeelModel`
+- 服务：继承 `KeelService`
+- 鉴权：`DependAuth` / `DependPermisson`（本地可 `DISABLE_AUTH=true`）
 
 ---
 
-## 配置就这几项
+## 配置与上线
 
-见 [`.env.example`](.env.example)。
+完整变量见 [`.env.example`](.env.example)。真正常改的只有这些：
 
 | 变量 | 干嘛的 |
 | --- | --- |
 | `DATABASE_URL` | 库连接（默认 SQLite 可跑） |
 | `SECRET_KEY` | JWT 密钥（≥ 32） |
 | `REDIS_URL` | 缓存 / token 黑名单（挂了会降级） |
-| `AUTO_CREATE_TABLES` | 开发自动建表；生产改 `false` + Alembic |
+| `AUTO_CREATE_TABLES` | 开发自动建表；生产改 `false` |
 | `BOOTSTRAP_ADMIN_*` | 首启超管 |
 
-生产迁移：
+本地可以偷懒：
 
 ```bash
-# AUTO_CREATE_TABLES=false
+AUTO_CREATE_TABLES=true
+```
+
+上生产前至少做这几件事：
+
+1. `DEBUG=false`，换掉默认超管密码和 `SECRET_KEY`
+2. `AUTO_CREATE_TABLES=false`，改用 Alembic：
+
+```bash
 make revision m="init"
 make migrate
+```
+
+3. `DATABASE_URL` 指到 PostgreSQL（或你的目标库）
+4. 按需启用 Redis，收紧 `CORS_ORIGINS`
+
+测试：
+
+```bash
+make test
+# 或
+pytest -q
 ```
 
 ---
@@ -128,19 +170,24 @@ fast_generic_api   库：ViewSet / Mixin / Backend
 keel               应用：规范、RBAC、工程化、模块骨架
 ```
 
+一个负责「怎么写接口」，一个负责「项目怎么立起来」。  
 Keel **用**它，不 **叫**它的名字。
 
 ---
 
 ## 鸣谢
 
-- [fast_generic_api](https://github.com/fzf54122/fast_generic_api) — CRUD 引擎  
-- [FastAPI](https://fastapi.tiangolo.com/) · [SQLAlchemy](https://www.sqlalchemy.org/) · [Alembic](https://alembic.sqlalchemy.org/)  
-- [Django REST framework](https://www.django-rest-framework.org/) — ViewSet 手感的源头  
+Keel 站在这些肩膀上：
 
-有用就 Star；也请给 `fast_generic_api` 一颗。
+- [fast_generic_api](https://github.com/fzf54122/fast_generic_api) — CRUD 引擎
+- [FastAPI](https://fastapi.tiangolo.com/) · [SQLAlchemy](https://www.sqlalchemy.org/) · [Alembic](https://alembic.sqlalchemy.org/)
+- [Django REST framework](https://www.django-rest-framework.org/) — ViewSet 手感的源头
+
+如果 Keel 帮你少走弯路，给这个仓库一颗 Star；也请给 `fast_generic_api` 一颗。
 
 ---
+
+龙骨立好了。剩下的，交给你的业务。
 
 ## License
 

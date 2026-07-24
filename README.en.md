@@ -56,10 +56,11 @@ pip install -e ".[dev]"   # or: uv sync --group dev
 make run-reload
 ```
 
-- Docs: http://127.0.0.1:8000/docs  
-- Health: http://127.0.0.1:8000/health  
-
-Default admin: `admin` / `AdminPass123` (change it)
+| | |
+| --- | --- |
+| Docs | http://127.0.0.1:8000/docs |
+| Health | http://127.0.0.1:8000/health |
+| Default admin | `admin` / `AdminPass123` (change it) |
 
 Optional infra:
 
@@ -67,9 +68,12 @@ Optional infra:
 make docker-up   # postgres + redis
 ```
 
+On first boot Keel will: create tables (dev mode) → seed menus / roles / superuser → sync the API registry.  
+Open Docs, hit `POST /api/auth/login/`, then play with `/api/items/`.
+
 ---
 
-## What you get
+## What is already bolted down
 
 | Layer | Contents |
 | --- | --- |
@@ -89,34 +93,72 @@ Common endpoints:
 | API sync | `POST /api/apis/refresh/` |
 | Demo | `/api/items/` |
 
-Add business here:
+---
+
+## How business grows on the keel
+
+Do not stuff business logic into `common/`. Grow by module:
 
 ```text
-application/modules/<name>/{apis,models,serializers,services}
+application/modules/<name>/
+├── apis/            # ViewSets / routes
+├── models/          # SQLAlchemy models
+├── serializers/     # request / response shapes
+└── services/        # domain actions
 ```
 
-Wire routes in `application/apis.py`, register models in `application/models/__init__.py`.
+Three hooks:
+
+1. Implement `apis` / `models` / `serializers` / `services` in the module
+2. Aggregate routes in [`application/apis.py`](application/apis.py)
+3. Register models in [`application/models/__init__.py`](application/models/__init__.py) so Alembic / `create_all` can see them
+
+Keep the conventions boring on purpose:
+
+- Response: `return KeelResponse(data=..., msg="...")`
+- Model: inherit `KeelModel`
+- Service: inherit `KeelService`
+- Auth: `DependAuth` / `DependPermisson` (local: `DISABLE_AUTH=true`)
 
 ---
 
-## Config that matters
+## Config and production
 
-See [`.env.example`](.env.example).
+Full list: [`.env.example`](.env.example). The ones you actually touch:
 
 | Variable | Purpose |
 | --- | --- |
 | `DATABASE_URL` | DB URL (SQLite works out of the box) |
 | `SECRET_KEY` | JWT secret (≥ 32) |
 | `REDIS_URL` | cache / token blacklist (degrades if down) |
-| `AUTO_CREATE_TABLES` | local auto-create; production: `false` + Alembic |
+| `AUTO_CREATE_TABLES` | local auto-create; production: `false` |
 | `BOOTSTRAP_ADMIN_*` | first-boot superuser |
 
-Production migrations:
+Local shortcut:
 
 ```bash
-# AUTO_CREATE_TABLES=false
+AUTO_CREATE_TABLES=true
+```
+
+Before production, at least:
+
+1. Set `DEBUG=false`, rotate the default admin password and `SECRET_KEY`
+2. Set `AUTO_CREATE_TABLES=false` and use Alembic:
+
+```bash
 make revision m="init"
 make migrate
+```
+
+3. Point `DATABASE_URL` at PostgreSQL (or your target DB)
+4. Enable Redis if needed and tighten `CORS_ORIGINS`
+
+Tests:
+
+```bash
+make test
+# or
+pytest -q
 ```
 
 ---
@@ -128,19 +170,25 @@ fast_generic_api   library: ViewSet / Mixin / Backend
 keel               app: conventions, RBAC, packaging, modules
 ```
 
+One answers “how do I write endpoints?”  
+The other answers “how does the project stand up?”  
 Keel **uses** it. Keel is **not** named after it.
 
 ---
 
 ## Acknowledgments
 
-- [fast_generic_api](https://github.com/fzf54122/fast_generic_api) — CRUD engine  
-- [FastAPI](https://fastapi.tiangolo.com/) · [SQLAlchemy](https://www.sqlalchemy.org/) · [Alembic](https://alembic.sqlalchemy.org/)  
-- [Django REST framework](https://www.django-rest-framework.org/) — the ViewSet feel  
+Keel stands on:
 
-If this helps, star the repo — and star `fast_generic_api` too.
+- [fast_generic_api](https://github.com/fzf54122/fast_generic_api) — CRUD engine
+- [FastAPI](https://fastapi.tiangolo.com/) · [SQLAlchemy](https://www.sqlalchemy.org/) · [Alembic](https://alembic.sqlalchemy.org/)
+- [Django REST framework](https://www.django-rest-framework.org/) — the ViewSet feel
+
+If Keel saves you a detour, star this repo — and star `fast_generic_api` too.
 
 ---
+
+The keel is set. The rest is your product.
 
 ## License
 
