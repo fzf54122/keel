@@ -66,8 +66,12 @@ make run-reload
 可选依赖：
 
 ```bash
-make docker-up   # postgres + redis
+make docker-up       # postgres + redis
+make celery-worker   # 异步任务 worker
+make celery-beat     # 定时调度
 ```
+
+任务接口：`POST /api/jobs/add/` · `GET /api/jobs/{task_id}/`
 
 第一次启动会自动：建表（开发模式）→ 种菜单/角色/超管 → 同步 API 权限表。  
 打开 Docs，先打 `POST /api/auth/login/`，再玩 `/api/items/`。

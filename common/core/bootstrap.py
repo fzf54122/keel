@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-"""Startup bootstrap: tables, menus, roles, admin, API sync."""
+"""Startup bootstrap: tables, seed data, API sync."""
 
 from __future__ import annotations
 
 from sqlalchemy import select
 
+from application.db.base import Base
+from application.db.backend import get_current_session
+from application.db.session import async_session_factory, engine
 from application.modules.rbac.enums import MenuType
 from application.modules.rbac.models import ApiModel, MenuModel, RoleModel
 from application.modules.rbac.services import ApiService
 from application.modules.system.models import UserModel
-from application.db.base import Base
-from application.db.backend import get_current_session
-from application.db.session import async_session_factory, engine
 from common.core.cache import cache_manager
 from common.core.password import get_password_hash
 from common.logger import logger
@@ -20,7 +20,7 @@ from conf import settings
 
 async def init_tables() -> None:
     if not settings.AUTO_CREATE_TABLES:
-        logger.info("AUTO_CREATE_TABLES=false, skip metadata.create_all")
+        logger.info("AUTO_CREATE_TABLES=false, skip metadata.create_all (use Alembic)")
         return
     import application.models  # noqa: F401
 
@@ -56,8 +56,11 @@ async def init_menus() -> None:
         ("API管理", "api", 4, "ant-design:api-outlined", "/system/api"),
         ("部门管理", "dept", 5, "mingcute:department-line", "/system/dept"),
         ("审计日志", "auditlog", 6, "ph:clipboard-text-bold", "/system/auditlog"),
-        ("Demo Items", "items", 7, "mdi:package-variant", "/demo/items"),
+        ("任务中心", "jobs", 7, "mdi:timer-cog-outline", "/system/jobs"),
     ]
+    if settings.ENABLE_DEMO:
+        children.append(("Demo Items", "items", 8, "mdi:package-variant", "/demo/items"))
+
     for name, path, order, icon, component in children:
         session.add(
             MenuModel(
@@ -124,11 +127,18 @@ async def init_superuser() -> None:
 
 async def init_apis(app) -> None:
     service = ApiService()
-    await service.refresh_api(app)
-    logger.info("API registry refreshed")
+    count = await service.refresh_api(app)
+    await service.grant_all_apis_to_admin()
+    logger.info(f"API registry refreshed ({count} routes)")
 
 
 async def init_data(app=None) -> None:
+    """启动顺序：
+    1) redis
+    2) tables
+    3) menus / roles / superuser
+    4) API sync（路由已挂载后）并给管理员补全权限
+    """
     logger.info("System bootstrap start")
     await cache_manager.connect()
     await init_tables()
@@ -139,10 +149,10 @@ async def init_data(app=None) -> None:
         token = _session_ctx.set(session)
         try:
             await init_menus()
-            if app is not None:
-                await init_apis(app)
             await init_roles()
             await init_superuser()
+            if app is not None:
+                await init_apis(app)
             await session.commit()
         except Exception:
             await session.rollback()

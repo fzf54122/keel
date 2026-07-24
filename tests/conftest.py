@@ -18,6 +18,7 @@ os.environ.setdefault("DISABLE_AUTH", "true")
 os.environ.setdefault("AUTO_CREATE_TABLES", "true")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/15")
 os.environ.setdefault("BOOTSTRAP_ADMIN_PASSWORD", "AdminPass123")
+os.environ.setdefault("CELERY_TASK_ALWAYS_EAGER", "true")
 
 
 @pytest.fixture(scope="session")

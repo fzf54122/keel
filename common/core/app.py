@@ -45,7 +45,9 @@ class SQLAlchemySessionMiddleware(BaseHTTPMiddleware):
         request.state.db = session
         try:
             response = await call_next(request)
-            await session.commit()
+            # 读请求不强制提交；写请求统一提交，避免空事务噪音
+            if request.method.upper() in {"POST", "PUT", "PATCH", "DELETE"}:
+                await session.commit()
             return response
         except Exception:
             await session.rollback()

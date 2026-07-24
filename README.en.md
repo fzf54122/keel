@@ -66,8 +66,12 @@ make run-reload
 Optional infra:
 
 ```bash
-make docker-up   # postgres + redis
+make docker-up       # postgres + redis
+make celery-worker   # async worker
+make celery-beat     # scheduler
 ```
+
+Job APIs: `POST /api/jobs/add/` · `GET /api/jobs/{task_id}/`
 
 On first boot Keel will: create tables (dev mode) → seed menus / roles / superuser → sync the API registry.  
 Open Docs, hit `POST /api/auth/login/`, then play with `/api/items/`.

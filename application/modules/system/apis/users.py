@@ -28,7 +28,7 @@ class UserViewSet(KeelViewSet):
     serializer_update_class = UsersUpdateSerializers
 
     @staticmethod
-    @router.post("/{uuid}/update_password/", summary="修改用户密码")
+    @router.post("/users/{uuid}/update_password/", summary="修改用户密码")
     async def update_user_password(
         uuid: str,
         password_data: UsersUpdatePasswordSerializers,

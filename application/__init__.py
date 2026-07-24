@@ -65,7 +65,31 @@ def create_app() -> FastAPI:
 
     @app.get("/health", tags=["health"])
     async def health():
-        return {"status": "ok", "app": settings.PROJECT_NAME, "version": settings.VERSION}
+        from sqlalchemy import text
+
+        from application.db.session import async_session_factory
+        from common.core.cache import cache_manager
+
+        db_ok = False
+        redis_ok = False
+        try:
+            async with async_session_factory() as session:
+                await session.execute(text("SELECT 1"))
+                db_ok = True
+        except Exception:
+            db_ok = False
+        try:
+            redis_ok = bool(cache_manager.redis and await cache_manager.redis.ping())
+        except Exception:
+            redis_ok = False
+
+        status = "ok" if db_ok else "degraded"
+        return {
+            "status": status,
+            "app": settings.PROJECT_NAME,
+            "version": settings.VERSION,
+            "checks": {"database": db_ok, "redis": redis_ok},
+        }
 
     register_exceptions(app)
     register_routers(app, prefix="/api")

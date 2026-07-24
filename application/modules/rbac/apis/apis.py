@@ -27,7 +27,7 @@ class ApiViewSet(KeelViewSet):
     serializer_update_class = APIUpdateSerializers
 
     @staticmethod
-    @router.post("/refresh/", summary="同步路由到API表")
+    @router.post("/apis/refresh/", summary="同步路由到API表")
     async def refresh(request: Request):
         await service.refresh_api(request.app)
         return KeelResponse(msg="API 同步完成")

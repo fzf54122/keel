@@ -70,6 +70,21 @@ class Settings(BaseSettings):
 
     DISABLE_AUTH: bool = False
     AUTO_CREATE_TABLES: bool = True  # convenient for sqlite/demo; prefer alembic in prod
+    ENABLE_DEMO: bool = True
+
+    # Celery
+    CELERY_BROKER_URL: str = ""
+    CELERY_RESULT_BACKEND: str = ""
+    CELERY_TIMEZONE: str = "Asia/Shanghai"
+    CELERY_TASK_ALWAYS_EAGER: bool = False  # True in tests: run tasks inline
+
+    @property
+    def celery_broker(self) -> str:
+        return self.CELERY_BROKER_URL or self.REDIS_URL
+
+    @property
+    def celery_backend(self) -> str:
+        return self.CELERY_RESULT_BACKEND or self.REDIS_URL
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

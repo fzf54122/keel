@@ -4,6 +4,7 @@ SHELL := /bin/bash
 APP ?= application:app
 HOST ?= 0.0.0.0
 PORT ?= 8000
+CELERY_APP ?= application.celery_app.celery
 
 HAS_UV := $(shell command -v uv >/dev/null 2>&1 && echo 1 || echo 0)
 ifeq ($(HAS_UV),1)
@@ -14,7 +15,8 @@ else
 	INSTALL := python -m pip install -e ".[dev]"
 endif
 
-.PHONY: help install run run-reload test lint fmt migrate revision docker-up docker-down
+.PHONY: help install run run-reload test lint fmt migrate revision \
+        docker-up docker-down celery-worker celery-beat celery-flower module
 
 help:
 	@awk 'BEGIN {FS=":.*##"} /^[a-zA-Z0-9_-]+:.*##/ {printf "\033[36m%-16s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -22,10 +24,10 @@ help:
 install: ## 安装依赖
 	$(INSTALL)
 
-run: ## 启动服务
+run: ## 启动 API
 	$(RUN) uvicorn $(APP) --host $(HOST) --port $(PORT)
 
-run-reload: ## 热重载启动
+run-reload: ## 热重载 API
 	$(RUN) uvicorn $(APP) --reload --host $(HOST) --port $(PORT)
 
 test: ## 运行测试
@@ -40,7 +42,7 @@ fmt: ## ruff format
 migrate: ## alembic upgrade head
 	$(RUN) alembic upgrade head
 
-revision: ## alembic revision --autogenerate -m "msg"  (make revision m="init")
+revision: ## alembic revision --autogenerate -m "msg"
 	$(RUN) alembic revision --autogenerate -m "$(m)"
 
 docker-up: ## 启动 postgres/redis
@@ -48,3 +50,16 @@ docker-up: ## 启动 postgres/redis
 
 docker-down: ## 停止依赖服务
 	docker compose down
+
+celery-worker: ## 启动 Celery worker
+	$(RUN) celery -A $(CELERY_APP) worker -l info
+
+celery-beat: ## 启动 Celery beat
+	$(RUN) celery -A $(CELERY_APP) beat -l info
+
+celery-flower: ## 启动 Flower 监控（可选）
+	$(RUN) celery -A $(CELERY_APP) flower
+
+module: ## 生成业务模块: make module name=order
+	@test -n "$(name)" || (echo "usage: make module name=order" && exit 1)
+	$(RUN) python scripts/new_module.py $(name)
