@@ -4,14 +4,15 @@
 
 **FastAPI 应用龙骨：DRF 风格 ViewSet + SQLAlchemy + RBAC**
 
-**简体中文**
+**简体中文** | [English](README.en.md)
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg)](https://fastapi.tiangolo.com/)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.x-red.svg)](https://www.sqlalchemy.org/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-yellow.svg)](LICENSE)
+[![GitHub](https://img.shields.io/badge/GitHub-fzf54122%2Fkeel-black.svg)](https://github.com/fzf54122/keel)
 
-[📖 快速开始](#-快速开始) • [🏗️ 架构](#-架构) • [📐 命名规范](#-命名规范) • [📚 API](#-api) • [🔧 配置](#-配置)
+[📖 快速开始](#-快速开始) • [🏗️ 架构](#-架构) • [📐 命名规范](#-命名规范) • [📚 API](#-api) • [🔧 配置](#-配置) • [🙏 鸣谢](#-鸣谢)
 
 </div>
 
@@ -24,7 +25,7 @@
 它不是又一个 CRUD 库，而是 **可直接开干的应用脚手架**：
 
 | 来源 | 你得到什么 |
-|------|------------|
+| --- | --- |
 | **FastAPI** | 异步、依赖注入、OpenAPI |
 | **DRF 手感** | ViewSet / Serializer / Permission / Mixin |
 | **SQLAlchemy** | 2.x async 模型、会话、Alembic 迁移 |
@@ -33,8 +34,8 @@
 <div align="center">
 
 | 🏗️ **三层架构** | 🔐 **RBAC** | ⚡ **开箱即用** | 🧩 **可扩展** |
-|:---:|:---:|:---:|:---:|
-| API / Service / Model | 用户·角色·菜单·API | JWT · 审计 · Demo | 按 modules 加业务 |
+| :---: | :---: | :---: | :---: |
+| API / Service / Model | 用户 · 角色 · 菜单 · API | JWT · 审计 · Demo | 按 modules 加业务 |
 
 </div>
 
@@ -45,6 +46,7 @@
 ## ✨ 核心能力
 
 ### 🔧 应用骨架
+
 - **应用工厂** `create_app` + lifespan 启动引导
 - **SQLAlchemy async** 会话中间件 + `backend_provider`
 - **Alembic** 迁移目录（生产推荐；开发可 `AUTO_CREATE_TABLES`）
@@ -52,12 +54,14 @@
 - **统一异常 / 限流 / 安全头 / 请求日志 / 审计日志**
 
 ### 🔐 RBAC
+
 - User / Role / Menu / Api / Dept / AuditLog
 - JWT access + refresh
 - `DependAuth` / `DependPermisson`
 - 首次启动引导：菜单、角色、超管、API 同步
 
 ### 📦 Demo
+
 - `/api/items/` 最小 CRUD，验证脚手架可跑通
 
 ---
@@ -65,7 +69,7 @@
 ## 🛠️ 技术栈
 
 | 组件 | 选型 |
-|------|------|
+| --- | --- |
 | Web | FastAPI 0.100+ |
 | CRUD 引擎 | [fast_generic_api](https://github.com/fzf54122/fast_generic_api) |
 | ORM | SQLAlchemy 2.x async |
@@ -77,7 +81,7 @@
 
 ---
 
-## 📁 项目结构
+## 🏗️ 架构
 
 ```text
 keel/
@@ -99,7 +103,7 @@ keel/
 │   ├── models/                   # 模型聚合（Alembic 用）
 │   └── modules/                  # 业务模块
 │       ├── system/               # 登录 / 用户
-│       ├── rbac/                 # 角色菜单API部门审计
+│       ├── rbac/                 # 角色 · 菜单 · API · 部门 · 审计
 │       └── demo/                 # Item 示例
 ├── alembic/
 ├── tests/
@@ -109,13 +113,20 @@ keel/
 └── pyproject.toml
 ```
 
-**分层约定**
+### 分层约定
 
 | 目录 | 职责 |
-|------|------|
+| --- | --- |
 | `common/` | 脚手架能力，跨项目可复用 |
 | `application/modules/*` | 业务模块，按领域增长 |
 | `conf/` | 配置，不写业务 |
+
+```text
+fast_generic_api  →  库：ViewSet / Mixin / Backend
+keel              →  应用脚手架：配置、RBAC、工程化、业务模块骨架
+```
+
+Keel **使用** `fast_generic_api`，但不继承其项目命名。
 
 ---
 
@@ -151,8 +162,8 @@ make run-reload
 uvicorn application:app --reload --host 0.0.0.0 --port 8000
 ```
 
-- Swagger: http://127.0.0.1:8000/docs
-- Health: http://127.0.0.1:8000/health
+- Swagger：http://127.0.0.1:8000/docs
+- Health：http://127.0.0.1:8000/health
 
 首次启动会自动：
 
@@ -163,7 +174,7 @@ uvicorn application:app --reload --host 0.0.0.0 --port 8000
 默认超管（请立刻修改）：
 
 | 项 | 值 |
-|----|----|
+| --- | --- |
 | 用户名 | `admin` |
 | 密码 | `AdminPass123`（`BOOTSTRAP_ADMIN_PASSWORD`） |
 
@@ -190,7 +201,7 @@ make migrate
 脚手架制定规范，业务只面向这些入口：
 
 | 规范类 | 用途 | 写法 |
-|--------|------|------|
+| --- | --- | --- |
 | **`KeelResponse`** | 统一响应信封 | `return KeelResponse(data=..., msg="...")` |
 | **`KeelService`** | Service 基类 | `class UserService(KeelService[UserModel])` |
 | **`KeelSchemas`** | Schema 基类 | 按需继承 |
@@ -200,7 +211,12 @@ make migrate
 响应体统一：
 
 ```json
-{ "code": 200, "status": "success", "data": {}, "msg": "OK" }
+{
+  "code": 200,
+  "status": "success",
+  "data": {},
+  "msg": "OK"
+}
 ```
 
 示例：
@@ -220,7 +236,7 @@ return KeelResponse(data=None, code=400, status="error", msg="密码错误")
 ## 📚 API
 
 | 模块 | 前缀 |
-|------|------|
+| --- | --- |
 | 登录 | `/api/auth/login/` `/api/auth/refresh/` `/api/auth/me/` |
 | 用户 | `/api/users/` |
 | 角色 | `/api/roles/` |
@@ -242,31 +258,37 @@ application/modules/<name>/{apis,models,serializers,services}
 
 ## 🔧 配置
 
-见 `.env.example`，常用项：
+见 [`.env.example`](.env.example)，常用项：
 
 | 变量 | 说明 |
-|------|------|
+| --- | --- |
 | `DATABASE_URL` | SQLAlchemy async URL |
 | `TABLE_PREFIX` | 表前缀，默认 `keel_` |
 | `REDIS_URL` | 缓存 / token 黑名单 |
-| `SECRET_KEY` | JWT 密钥（≥32） |
+| `SECRET_KEY` | JWT 密钥（≥ 32） |
 | `DISABLE_AUTH` | 本地调试跳过鉴权 |
 | `AUTO_CREATE_TABLES` | 开发自动建表 |
 | `BOOTSTRAP_ADMIN_*` | 首启超管 |
 
 ---
 
-## 🤝 与 fast_generic_api 的关系
+## 🙏 鸣谢
 
-```text
-fast_generic_api  →  库：ViewSet / Mixin / Backend
-keel              →  应用脚手架：配置、RBAC、工程化、业务模块骨架
-```
+Keel 站在这些优秀项目与社区之上：
 
-Keel **使用** `fast_generic_api`，但不继承其项目命名。
+| 项目 | 说明 |
+| --- | --- |
+| [fast_generic_api](https://github.com/fzf54122/fast_generic_api) | DRF 风格 ViewSet / Mixin / Backend，Keel 的 CRUD 引擎 |
+| [FastAPI](https://fastapi.tiangolo.com/) | 现代异步 Web 框架 |
+| [SQLAlchemy](https://www.sqlalchemy.org/) | 2.x async ORM |
+| [Django REST Framework](https://www.django-rest-framework.org/) | ViewSet / Serializer / Permission 的设计灵感 |
+| [Pydantic](https://docs.pydantic.dev/) | 数据校验与设置 |
+| [Alembic](https://alembic.sqlalchemy.org/) | 数据库迁移 |
+
+感谢开源社区的持续贡献。如果你觉得 Keel 有用，欢迎 Star 本仓库，也请给 [fast_generic_api](https://github.com/fzf54122/fast_generic_api) 一个 Star。
 
 ---
 
-## License
+## 📄 License
 
-Apache-2.0
+[Apache-2.0](LICENSE)
