@@ -15,7 +15,7 @@ from celery.schedules import crontab
 from conf import settings
 
 celery = Celery(
-    "keel",
+    settings.PROJECT_NAME,
     broker=settings.celery_broker,
     backend=settings.celery_backend,
     include=[
@@ -39,12 +39,12 @@ celery.conf.update(
     task_store_eager_result=True,
     beat_schedule={
         # 每分钟心跳，验证 beat 可用
-        "keel-heartbeat-every-minute": {
+        f"{settings.PROJECT_NAME}-heartbeat-every-minute": {
             "task": "jobs.system.heartbeat",
             "schedule": 60.0,
         },
         # 每天 03:15 清理示例（占位）
-        "keel-daily-cleanup": {
+        f"{settings.PROJECT_NAME}-daily-cleanup": {
             "task": "jobs.system.daily_cleanup",
             "schedule": crontab(hour=3, minute=15),
         },

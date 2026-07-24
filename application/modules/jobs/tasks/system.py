@@ -12,7 +12,9 @@ from common.logger import logger
 @celery.task(name="jobs.system.heartbeat")
 def heartbeat() -> dict:
     now = datetime.now().isoformat(timespec="seconds")
-    logger.info(f"keel heartbeat at {now}")
+    from conf import settings
+
+    logger.info(f"{settings.PROJECT_NAME} heartbeat at {now}")
     return {"ok": True, "at": now}
 
 

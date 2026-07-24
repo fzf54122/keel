@@ -16,13 +16,29 @@ else
 endif
 
 .PHONY: help install run run-reload test lint fmt migrate revision \
-        docker-up docker-down celery-worker celery-beat celery-flower module
+        docker-up docker-down celery-worker celery-beat celery-flower module new
 
 help:
 	@awk 'BEGIN {FS=":.*##"} /^[a-zA-Z0-9_-]+:.*##/ {printf "\033[36m%-16s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 install: ## 安装依赖
 	$(INSTALL)
+
+new: ## 用 Copier 从本脚手架创建项目: make new name=my-api [dest=../my-api]
+	@test -n "$(name)" || (echo "usage: make new name=my-api [dest=../my-api]" && exit 1)
+	@dest="$(if $(dest),$(dest),../$(name))"; \
+	if command -v uvx >/dev/null 2>&1; then \
+	  uvx --from copier copier copy --trust --defaults \
+	    --data project_name=$(name) \
+	    . "$$dest"; \
+	elif command -v copier >/dev/null 2>&1; then \
+	  copier copy --trust --defaults \
+	    --data project_name=$(name) \
+	    . "$$dest"; \
+	else \
+	  echo "need uvx or copier: pipx install copier  /  uv tool install copier"; \
+	  exit 1; \
+	fi
 
 run: ## 启动 API
 	$(RUN) uvicorn $(APP) --host $(HOST) --port $(PORT)

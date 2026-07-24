@@ -97,9 +97,9 @@ class Settings(BaseSettings):
                 # late import to avoid logger cycles at import time in some tools
                 try:
                     from common.logger import logger
-                    logger.warning(f"[keel] {msg}")
+                    logger.warning(f"[{self.PROJECT_NAME}] {msg}")
                 except Exception:
-                    print(f"[keel] WARNING: {msg}")
+                    print(f"[{self.PROJECT_NAME}] WARNING: {msg}")
 
     @field_validator("SECRET_KEY")
     @classmethod

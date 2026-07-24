@@ -1,0 +1,131 @@
+# Copier template for Keel (this repo IS the template).
+# https://copier.readthedocs.io/
+#
+# Create a project:
+#   uvx --from copier copier copy gh:fzf54122/keel my-api
+#   # or from a local checkout:
+#   uvx --from copier copier copy /path/to/keel my-api
+
+_min_copier_version: "9.0.0"
+
+_exclude:
+  - .git
+  - .git/**/*
+  - .venv
+  - .venv/**/*
+  - venv
+  - venv/**/*
+  - uv.lock
+  - __pycache__
+  - "**/__pycache__"
+  - "*.py[cod]"
+  - .pytest_cache
+  - .pytest_cache/**/*
+  - .mypy_cache
+  - .mypy_cache/**/*
+  - .ruff_cache
+  - .ruff_cache/**/*
+  - .coverage
+  - htmlcov
+  - htmlcov/**/*
+  - "*.db"
+  - dev.db
+  - .env
+  - .env.local
+  - logs/*
+  - "!logs/.gitkeep"
+  - uploads/*
+  - "!uploads/.gitkeep"
+  - .idea
+  - .idea/**/*
+  - .vscode
+  - .vscode/**/*
+  - "*.egg-info"
+  - "*.egg-info/**/*"
+  - dist
+  - dist/**/*
+  - build
+  - build/**/*
+  - .claude
+  - .claude/**/*
+  # template meta — do not ship into business projects
+  - copier.yml
+
+# Run after files are rendered into the destination project.
+# Pass answers on argv — more reliable than reading .copier-answers.yml timing.
+_tasks:
+  - command:
+      - "{{ _copier_python }}"
+      - "scripts/copier_post.py"
+      - "--project-name"
+      - "{{ project_name }}"
+      - "--app-title"
+      - "{{ app_title }}"
+      - "--table-prefix"
+      - "{{ table_prefix }}"
+      - "--author-name"
+      - "{{ author_name }}"
+      - "--author-email"
+      - "{{ author_email }}"
+      - "--include-demo"
+      - "{{ include_demo }}"
+      - "--include-celery"
+      - "{{ include_celery }}"
+      - "--use-postgres"
+      - "{{ use_postgres }}"
+    when: "{{ _copier_operation == 'copy' }}"
+
+# Keep answers file in the generated project for `copier update`.
+_answers_file: .copier-answers.yml
+
+# ---------------------------------------------------------------------------
+# Questions
+# ---------------------------------------------------------------------------
+
+project_name:
+  type: str
+  help: Project slug (package / docker / env PROJECT_NAME). snake or kebab ok.
+  placeholder: my-api
+  validator: >-
+    {% if not (project_name | regex_search('^[a-z][a-z0-9_-]*$')) %}
+    Must start with a letter; only a-z, 0-9, _ and - allowed
+    {% endif %}
+
+app_title:
+  type: str
+  help: Human-readable app title (OpenAPI / APP_TITLE)
+  default: "{{ project_name.replace('-', ' ').replace('_', ' ').title() }}"
+
+table_prefix:
+  type: str
+  help: SQL table prefix (always ends with _)
+  default: "{{ project_name.replace('-', '_') }}_"
+  validator: >-
+    {% if not (table_prefix | regex_search('^[a-z][a-z0-9_]*_$')) %}
+    Must be snake_case and end with _
+    {% endif %}
+
+author_name:
+  type: str
+  help: Author name for pyproject.toml
+  default: "developer"
+
+author_email:
+  type: str
+  help: Author email for pyproject.toml
+  default: "dev@example.com"
+
+include_demo:
+  type: bool
+  help: Keep the demo /api/items/ module?
+  default: true
+
+include_celery:
+  type: bool
+  help: Keep Celery jobs module (worker / beat APIs)?
+  default: true
+
+use_postgres:
+  type: bool
+  help: Default DATABASE_URL to local Postgres (else SQLite)?
+  default: true

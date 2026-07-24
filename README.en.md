@@ -47,7 +47,50 @@ return KeelResponse(data=user, msg="ok")
 
 ---
 
-## Quick Start
+## Create a project (one command)
+
+Use [Copier](https://copier.readthedocs.io/) against this scaffold: rename, table prefix, random secrets, `.env`, optional demo / Celery strip.
+
+```bash
+# recommended — no global install (--trust runs the post-generate rebrand task)
+uvx --from copier copier copy --trust gh:fzf54122/keel my-api
+
+# or with copier installed
+copier copy --trust gh:fzf54122/keel my-api
+
+# non-interactive (all defaults)
+uvx --from copier copier copy --trust --defaults \
+  --data project_name=my-api \
+  gh:fzf54122/keel my-api
+
+# from a local checkout of this repo
+make new name=my-api dest=../my-api
+```
+
+| Question | Default | Meaning |
+| --- | --- | --- |
+| `project_name` | (required) | package / docker / `PROJECT_NAME` |
+| `app_title` | derived from name | OpenAPI / `APP_TITLE` |
+| `table_prefix` | `{project}_` | SQL table prefix |
+| `author_name` / `author_email` | developer@… | `pyproject.toml` author |
+| `include_demo` | true | keep `/api/items/` |
+| `include_celery` | true | keep jobs / Celery |
+| `use_postgres` | true | Postgres default; false → SQLite |
+
+Then:
+
+```bash
+cd my-api
+uv sync --group dev   # or: pip install -e ".[dev]"
+make run-reload
+```
+
+- New module: `make module name=order`
+- Upgrade scaffold later: `copier update` (from the project root)
+
+---
+
+## Quick Start (run this repo)
 
 ```bash
 git clone git@github.com:fzf54122/keel.git

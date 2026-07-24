@@ -47,7 +47,50 @@ return KeelResponse(data=user, msg="ok")
 
 ---
 
-## 快速启动
+## 一键创建项目
+
+用成熟工具 [Copier](https://copier.readthedocs.io/) 从本脚手架生成业务项目：自动改名、表前缀、随机密钥、`.env`，可选去掉 demo / Celery。
+
+```bash
+# 推荐：无需全局安装（--trust 允许执行生成后 rebrand 脚本）
+uvx --from copier copier copy --trust gh:fzf54122/keel my-api
+
+# 或已安装 copier
+copier copy --trust gh:fzf54122/keel my-api
+
+# 非交互（全默认）
+uvx --from copier copier copy --trust --defaults \
+  --data project_name=my-api \
+  gh:fzf54122/keel my-api
+
+# 本地调试脚手架时
+make new name=my-api dest=../my-api
+```
+
+| 问题 | 默认 | 说明 |
+| --- | --- | --- |
+| `project_name` | （必填） | 包名 / docker / `PROJECT_NAME` |
+| `app_title` | 由项目名推导 | OpenAPI / `APP_TITLE` |
+| `table_prefix` | `{project}_` | 表前缀 |
+| `author_name` / `author_email` | developer@… | `pyproject.toml` 作者 |
+| `include_demo` | true | 是否保留 `/api/items/` |
+| `include_celery` | true | 是否保留 jobs / Celery |
+| `use_postgres` | true | 默认 Postgres；false 则 SQLite |
+
+生成后：
+
+```bash
+cd my-api
+uv sync --group dev   # 或: pip install -e ".[dev]"
+make run-reload
+```
+
+- 业务模块：`make module name=order`
+- 脚手架升级回灌：在业务项目根目录执行 `copier update`
+
+---
+
+## 快速启动（直接跑本仓库）
 
 ```bash
 git clone git@github.com:fzf54122/keel.git
