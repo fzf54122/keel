@@ -46,7 +46,7 @@ return KeelResponse(data=user, msg="ok")
 
 ---
 
-## 30 秒启动
+## 快速启动
 
 ```bash
 git clone git@github.com:fzf54122/keel.git
@@ -73,7 +73,7 @@ make docker-up   # postgres + redis
 
 ---
 
-## 骨架上已经钉好的东西
+## 已有能力
 
 | 层 | 内容 |
 | --- | --- |
@@ -95,7 +95,7 @@ make docker-up   # postgres + redis
 
 ---
 
-## 业务怎么往上长
+## 业务扩展
 
 别在 `common/` 里塞业务。新能力按模块长：
 
@@ -122,7 +122,7 @@ application/modules/<name>/
 
 ---
 
-## 配置与上线
+## 配置上线
 
 完整变量见 [`.env.example`](.env.example)。真正常改的只有这些：
 
@@ -163,7 +163,7 @@ pytest -q
 
 ---
 
-## 和 fast_generic_api 的分工
+## 库的分工
 
 ```text
 fast_generic_api   库：ViewSet / Mixin / Backend
@@ -175,7 +175,7 @@ Keel **用**它，不 **叫**它的名字。
 
 ---
 
-## 🙏 鸣谢
+## 鸣谢
 
 | | 项目 | 角色 |
 | --- | --- | --- |
@@ -186,7 +186,7 @@ Keel **用**它，不 **叫**它的名字。
 
 <div align="center">
 
-### 龙骨立好了。剩下的，交给你的业务。
+龙骨立好了。剩下的，交给你的业务。
 
 有用的话，给 [Keel](https://github.com/fzf54122/keel) 和 [fast_generic_api](https://github.com/fzf54122/fast_generic_api) 各一颗 ⭐
 

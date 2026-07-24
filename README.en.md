@@ -46,7 +46,7 @@ return KeelResponse(data=user, msg="ok")
 
 ---
 
-## 30-second start
+## Quick Start
 
 ```bash
 git clone git@github.com:fzf54122/keel.git
@@ -73,7 +73,7 @@ Open Docs, hit `POST /api/auth/login/`, then play with `/api/items/`.
 
 ---
 
-## What is already bolted down
+## Features
 
 | Layer | Contents |
 | --- | --- |
@@ -95,7 +95,7 @@ Common endpoints:
 
 ---
 
-## How business grows on the keel
+## Extend
 
 Do not stuff business logic into `common/`. Grow by module:
 
@@ -122,7 +122,7 @@ Keep the conventions boring on purpose:
 
 ---
 
-## Config and production
+## Config
 
 Full list: [`.env.example`](.env.example). The ones you actually touch:
 
@@ -163,7 +163,7 @@ pytest -q
 
 ---
 
-## vs fast_generic_api
+## vs Library
 
 ```text
 fast_generic_api   library: ViewSet / Mixin / Backend
@@ -176,7 +176,7 @@ Keel **uses** it. Keel is **not** named after it.
 
 ---
 
-## 🙏 Acknowledgments
+## Thanks
 
 | | Project | Role |
 | --- | --- | --- |
@@ -187,7 +187,7 @@ Keel **uses** it. Keel is **not** named after it.
 
 <div align="center">
 
-### The keel is set. The rest is your product.
+The keel is set. The rest is your product.
 
 If it helps, leave a ⭐ on [Keel](https://github.com/fzf54122/keel) and [fast_generic_api](https://github.com/fzf54122/fast_generic_api)
 
